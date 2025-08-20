@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fimoney MCP Mock Data Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    h2 { margin-top: 2em; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2em; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>Fimoney MCP Mock Data Viewer</h1>
+  <div id="assets"></div>
+  <div id="liabilities"></div>
+  <div id="flows"></div>
+  <div id="transactions"></div>
+  <div id="goals"></div>
+  <div id="profile"></div>
+
+  <script>
+    async function fetchAndDisplay(endpoint, containerId, columns) {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      const items = data[Object.keys(data)[0]];
+      let html = `<h2>${containerId.charAt(0).toUpperCase() + containerId.slice(1)}</h2>`;
+      html += '<table><tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr>';
+      for (const item of items) {
+        html += '<tr>' + columns.map(c => `<td>${item[c] ?? ''}</td>`).join('') + '</tr>';
+      }
+      html += '</table>';
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    fetchAndDisplay('http://localhost:3000/mcp/get_assets', 'assets', ['type', 'name', 'value', 'currency']);
+    fetchAndDisplay('http://localhost:3000/mcp/get_liabilities', 'liabilities', ['type', 'name', 'value', 'currency', 'interest_rate']);
+    fetchAndDisplay('http://localhost:3000/mcp/get_flows', 'flows', ['month', 'inflow', 'outflow']);
+    fetchAndDisplay('http://localhost:3000/mcp/get_transactions', 'transactions', ['id', 'date', 'type', 'amount', 'description', 'account']);
+    fetchAndDisplay('http://localhost:3000/mcp/get_goals', 'goals', ['id', 'name', 'target_amount', 'current_amount', 'target_year']);
+    // Profile is a single object, not an array
+    fetch('http://localhost:3000/mcp/get_profile')
+      .then(res => res.json())
+      .then(data => {
+        const profile = data.profile;
+        let html = '<h2>Profile</h2><table>';
+        for (const key in profile) {
+          html += `<tr><th>${key}</th><td>${profile[key]}</td></tr>`;
+        }
+        html += '</table>';
+        document.getElementById('profile').innerHTML = html;
+      });
+  </script>
+</body>
+</html>
