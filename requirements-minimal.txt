@@ -1,0 +1,17 @@
+# Core
+fastapi==0.95.2
+uvicorn[standard]==0.22.0
+python-dotenv==1.0.0
+
+# MongoDB
+pymongo==4.5.0
+motor==3.3.2
+beanie==1.20.0
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Pydantic
+pydantic==1.10.7
